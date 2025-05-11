@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,7 @@ class PostController extends Controller
         }
 
         return response()->json([
-            'data' => $posts,
+            'data' => PostResource::collection($posts),
             'message' => 'Posts retrieved successfully',
             'status' => 200
         ], 200);
@@ -49,7 +50,7 @@ class PostController extends Controller
             'body' => $request->body
         ]);
         return response()->json([
-            'data' => $post,
+            'data' => new PostResource($post),
             'message' => 'Post created successfully',
             'status' => 201
         ], 201);
