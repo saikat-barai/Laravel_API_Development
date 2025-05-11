@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -30,25 +31,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'body' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-                'message' => 'Validation Error',
-                'status' => 422
-            ], 422);
-        }
-
-        $post = Post::create([
-            'title' => $request->title,
-            'body' => $request->body
-        ]);
+        $data = $request->validated();
+        $post = Post::create($data);
         return response()->json([
             'data' => new PostResource($post),
             'message' => 'Post created successfully',
@@ -75,7 +61,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PostRequest $request, string $id)
     {
         $post = Post::find($id);
         if (!$post) {
@@ -85,24 +71,10 @@ class PostController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'body' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-                'message' => 'Validation Error',
-                'status' => 422
-            ], 422);
-        }
+        $data = $request->validated();
 
         try {
-            $post->update([
-                'title' => $request->title,
-                'body' => $request->body
-            ]);
+            $post->update($data);
             return response()->json([
                 'data' => $post,
                 'message' => 'Post updated successfully',
